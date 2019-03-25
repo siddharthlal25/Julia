@@ -234,8 +234,8 @@ function DGSM(f,k, samples, rangeLower, rangeUpper,distri)
     #respectively for the k independent parameters
     #The ith row consists of E(a), E(|a|) and E(a^2) for the ith independent parameter
     
-    DGSM = hcat(E_a, E_moda)
-    DGSM = hcat(DGSM, E_a2)
-    return DGSM
+    outputf = hcat(E_a, E_moda)
+    outputf = hcat(outputf , E_a2)
+    return outputf
 end
     
