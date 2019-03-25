@@ -6,7 +6,7 @@ using Statistics
 
 """
 
-The inputs to the function DGSM_Gen are as follows:
+The inputs to the function DGSM are as follows:
 1.f: 
     This is the input function based on which the values of DGSM are to be evaluated
     Eg- f(x) = x[1]+x[2]^2
@@ -74,7 +74,7 @@ The inputs to the function DGSM_Gen are as follows:
 """
 
 
-function DGSM_Gen(f,k, samples, rangeLower, rangeUpper,distri)
+function DGSM(f,k, samples, rangeLower, rangeUpper,distri)
     
     #Initialising the limits to zero
     sobolLimitsUpper = zeros(Float64,1,k)
