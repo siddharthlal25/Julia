@@ -1,36 +1,29 @@
 using StatsFuns
-using Sobol
 using Distributions
 using ForwardDiff
 using Statistics
 
 """
-
 The inputs to the function DGSM are as follows:
 1.f: 
     This is the input function based on which the values of DGSM are to be evaluated
     Eg- f(x) = x[1]+x[2]^2
         This is function in 2 variables
-
 2.k:
     Depicts the number of independent parameters in the function
     Eg- f(x) = log(x[1])+x[2]^2+x[3]
         => k = 3
-
 3.samples:
     Depicts the number of sampling set of points to be used for evaluation of E(a), E(|a|) and E(a^2)
     a = partial derivative of f wrt x_i
-
 4.rangeLower:
     This is a 1*k dimension matrix consisting of the lower bounds of the independent variables
     Eg- rangeLower = [x1(l) x2(l) x3(l).....xk(l)]
         consists the lower bounds of the corresponding variable in the above displayed manner
-
 5.rangeUpper:
     This is a 1*k dimension matrix consisting of the upper bounds of the independent variables
     Eg- rangeUpper = [x1(u) x2(u) x3(u).....xk(u)]
         consists the upper bounds of the corresponding variable in the above displayed manner
-
 6.distri:
     This is a k*3 dimension matrix depicting the distribution of the k independent variables 
     The first column of the ith row depicts the distribution of the x_i 
@@ -42,9 +35,7 @@ The inputs to the function DGSM are as follows:
     5 ===>    T Distribution
     6 ===>    Uniform Continous Distribution
     7 ===>    Poisson Distribution
-    8 ===>    Binomial Distribution
-    9 ===>    Negative Binomial Distribution
-
+    
     The next 2 columns of ith row i.e. 2nd and 3rd columns contains the information about the distribution
     Number || Column 2 || Column 3
     1 ====>   mean        standard deviation
@@ -54,99 +45,361 @@ The inputs to the function DGSM are as follows:
     5 ====>   d           0.0
     6 ====>   0.0         0.0
     7 ====>   lambda      0.0
-    8 ====>   n           p
-    9 ====>   r           p
-
+    
     These are the characterstics which define the distribution uniquely. A 0.0 in table represents that the 
     specific column data for the distribution is not required.
-
     For more information about the parameters being input for distributions refer the below link:
     https://juliastats.github.io/Distributions.jl/stable/univariate.html
-
-    Eg-Suppose f(x) = sin(x[1])+x[2]^2+x[3]
+    Eg-Suppose f(x) = sin(x[1])+x[2]^2
         x[1] is N(5,6) Distribution
         x[2] is Uniform Continous Random Distribution
-        x[3] is T Distribution with d = 4.2
+        
         The distri matrix is
         1  5.0  6.0
         6  0.0  0.0
-        5  4.2  0.0
+
+
 """
 
+mutable struct dgsm
+    a::Float64
+    absa::Float64
+    asq::Float64
+end
 
-function DGSM(f,k, samples, rangeLower, rangeUpper,distri)
+function element_generator(type_of_distribution, lower_limit, upper_limit, distribution_param1, distribution_param2)
     
-    #Initialising the limits to zero
-    sobolLimitsUpper = zeros(Float64,1,k)
-    sobolLimitsLower = zeros(Float64,1,k)
+    if(type_of_distribution == 1)
+        while true
+            
+            x = rand(Normal(distribution_param1,distribution_param2))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 2)
+        while true
+            x = rand(Beta(distribution_param1,distribution_param2))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 3)
+        while true
+            x = rand(Gamma(distribution_param1,distribution_param2))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 4)
+        while true
+            x = rand(FDist(distribution_param1,distribution_param2))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 5)
+        while true
+            x = rand(TDist(distribution_param1))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 6)
+        x = lower_limit + (upper_limit - lower_limit)*rand()
+        return x
+    
+    
+    elseif(type_of_distribution == 7)
+        while true
+            x = rand(Poisson(distribution_param1))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 8)
+        while true
+            x = rand(Arcsine(distribution_param1,distribution_param2))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 9)
+        while true
+            x = rand(BetaPrime(distribution_param1,distribution_param2))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 10)
+        while true
+            x = rand(Biweight(distribution_param1,distribution_param2))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 11)
+        while true
+            x = rand(Cauchy(distribution_param1,distribution_param2))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 12)
+        while true
+            x = rand(Chi(distribution_param1))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 13)
+        while true
+            x = rand(Chisq(distribution_param1))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 14)
+        while true
+            x = rand(Cosine(distribution_param1,distribution_param2))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 15)
+        while true
+            x = rand(Epanechnikov(distribution_param1,distribution_param2))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 16)
+        while true
+            x = rand(Erlang(distribution_param1,distribution_param2))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 17)
+        while true
+            x = rand(Exponential(distribution_param1))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 18)
+        while true
+            x = rand(Frechet(distribution_param1,distribution_param2))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 19)
+        while true
+            x = rand(Gumbel(distribution_param1,distribution_param2))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 20)
+        while true
+            x = rand(InverseGamma(distribution_param1,distribution_param2))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 21)
+        while true
+            x = rand(InverseGaussian(distribution_param1,distribution_param2))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 22)
+        while true
+            x = rand(KSDist(distribution_param1))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 23)
+        while true
+            x = rand(KSOneSided(distribution_param1))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 24)
+        while true
+            x = rand(Laplace(distribution_param1,distribution_param2))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 25)
+        while true
+            x = rand(Levy(distribution_param1,distribution_param2))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 26)
+        while true
+            x = rand(Logistic(distribution_param1,distribution_param2))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 27)
+        while true
+            x = rand(LogNormal(distribution_param1,distribution_param2))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 28)
+        while true
+            x = rand(NoncentralChisq(distribution_param1,distribution_param2))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 29)
+        while true
+            x = rand(NoncentralT(distribution_param1,distribution_param2))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 30)
+        while true
+            x = rand(NormalCanon(distribution_param1,distribution_param2))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 31)
+        while true
+            x = rand(Pareto(distribution_param1,distribution_param2))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 32)
+        while true
+            x = rand(Rayleigh(distribution_param1))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 33)
+        while true
+            x = rand(SymTriangularDist(distribution_param1,distribution_param2))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 34)
+        while true
+            x = rand(Triweight(distribution_param1,distribution_param2))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 35)
+        while true
+            x = rand(VonMises(distribution_param1,distribution_param2))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    
+    
+    elseif(type_of_distribution == 36)
+        while true
+            x = rand(Weibull(distribution_param1,distribution_param2))
+            if (x>= lower_limit && x<= upper_limit)
+                return x
+            end
+        end
+    end
+    
+end
+
+
+
+function DGSM_Gen(f,k, samples, rangeLower, rangeUpper,distri)
+    
     
     #Initialising the gradient matrix to zeros
     dfdx = zeros(Float64, samples, k)
     
-    
-    #Determining the upper and lower limits of k-dimensional sobol sequences
-    #Transforming the real bounds into Sobol sequence bounds using cdf
-    for i = 1 : k
-        
-        if(distri[i]==1)
-            sobolLimitsUpper[i] = normcdf(distri[i+k],distri[i+2*k],rangeUpper[i])
-            sobolLimitsLower[i] = normcdf(distri[i+k],distri[i+2*k],rangeLower[i])
-            
-        end
-        
-        if(distri[i]==2)
-            sobolLimitsUpper[i] = betacdf(distri[i+k],distri[i+2*k],rangeUpper[i])
-            sobolLimitsLower[i] = betacdf(distri[i+k],distri[i+2*k],rangeLower[i])
-            
-        end
-        
-        if(distri[i]==3)
-            sobolLimitsUpper[i] = gammacdf(distri[i+k],distri[i+2*k],rangeUpper[i])
-            sobolLimitsLower[i] = gammacdf(distri[i+k],distri[i+2*k],rangeLower[i])
-        
-        end
-        
-        if(distri[i]==4)
-            sobolLimitsUpper[i] = fdistcdf(distri[i+k],distri[i+2*k],rangeUpper[i])
-            sobolLimitsLower[i] = fdistcdf(distri[i+k],distri[i+2*k],rangeLower[i])
-        
-        end
-        
-        if(distri[i]==5)
-            sobolLimitsUpper[i] = tdistcdf(distri[i+k],rangeUpper[i])
-            sobolLimitsLower[i] = tdistcdf(distri[i+k],rangeLower[i])
-        
-        end
-        
-        if(distri[i]==6)
-            sobolLimitsUpper[i] = 1.0
-            sobolLimitsLower[i] = 0.0
-        
-        end
-        
-        if(distri[i] == 7)
-            sobolLimitsUpper[i] = poiscdf(distri[i+k],rangeUpper[i])
-            sobolLimitsLower[i] = poiscdf(distri[i+k],rangeLower[i])
-        
-        end
-        
-        if(distri[i]==8)
-            sobolLimitsUpper[i] = binomcdf(distri[i+k],distri[i+2*k],rangeUpper[i])
-            sobolLimitsLower[i] = binomcdf(distri[i+k],distri[i+2*k],rangeLower[i])
-        
-        end
-        
-        if(distri[i]==9)
-            sobolLimitsUpper[i] = nbinomcdf(distri[i+k],distri[i+2*k],rangeUpper[i])
-            sobolLimitsLower[i] = nbinomcdf(distri[i+k],distri[i+2*k],rangeLower[i])
-        
-        end
-        
-    end
-    
-    
-    #s is assigned the upper and lower limits of the bounds of sobol limits
-    s = SobolSeq(sobolLimitsLower, sobolLimitsUpper)
     
     
     #XX is the matrix consisting of 'samples' number of sampling based on respective 
@@ -154,48 +407,11 @@ function DGSM(f,k, samples, rangeLower, rangeUpper,distri)
     
     XX = zeros(Float64,samples,k)
     for i = 1:samples
-        x = next!(s)
-        XX[i,:] = x
         
-        
-        for j = 1:k 
+        for j = 1:k
             index = i+(j-1)*samples
             
-            if(distri[j] == 1)
-                XX[index] = norminvcdf(distri[j+k],distri[j+2*k],XX[index])
-            end
-            
-            if(distri[j] == 2)
-                XX[index] = betainvcdf(distri[j+k],distri[j+2*k],XX[index])
-            end
-            
-            if(distri[j] == 3)
-                XX[index] = gammainvcdf(distri[j+k],distri[j+2*k],XX[index])
-            end
-            
-            if(distri[j] == 4)
-                XX[index] = fdistinvcdf(distri[j+k],distri[j+2*k],XX[index])
-            end
-            
-            if(distri[j] == 5)
-                XX[index] = tdistinvcdf(distri[j+k],XX[index])
-            end
-            
-            if(distri[j] == 6)
-                XX[index] = rangeLower[j] + (rangeUpper[j]-rangeLower[j])*XX[index]
-            end
-            
-            if(distri[j] == 7)
-                XX[index] = poisinvcdf(distri[j+k],XX[index])
-            end
-            
-            if(distri[j] == 8)
-                XX[index] = binominvcdf(distri[j+k],distri[j+2*k],XX[index])
-            end
-            
-            if(distri[j] == 9)
-                XX[index] = nbinominvcdf(distri[j+k],distri[j+2*k],XX[index])
-            end
+            XX[index] = element_generator(distri[j],rangeLower[j],rangeUpper[j],distri[j+k],distri[j+2*k])
             
         end
     end
@@ -213,21 +429,24 @@ function DGSM(f,k, samples, rangeLower, rangeUpper,distri)
     
     #Evaluating E(a) and E(a^2)
     
-    a = [mean(dfdx[:,x]) for x in 1:k]
-    asq = [mean(dfdx[:,x].^2) for x in 1:k]
+    DGSM = [dgsm(0.0,0.0,0.0) for i in 1:k]
+    
+    for i = 1:k
+        DGSM[i].a = mean(dfdx[:,i])
+        DGSM[i].asq = mean(dfdx[:,i].^2)
+    end
+    
     
     dfdx = abs.(dfdx)
     
     #Evaluating E(|a|)
     
-    absa = [mean(dfdx[:,x]) for x in 1:k]
+    for i = 1:k
+        DGSM[i].absa = mean(dfdx[:,i])
+    end
     
-    #This function finally returns a matrix ok k*3 matrix, consisting E(a), E(|a|) and E(a^2)
+    #This function finally returns an array of structures, consisting a, absa and asq
     #respectively for the k independent parameters
-    #The ith row consists of E(a), E(|a|) and E(a^2) for the ith independent parameter
     
-    outputf = hcat(a, absa)
-    outputf = hcat(outputf , asq)
-    return outputf
+    return DGSM
 end
-    
