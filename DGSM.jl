@@ -26,7 +26,7 @@ end
 
 function DGSM_Gen(f,samples,distr)
     
-    k = length(dist)
+    k = length(distr)
     
     #XX is the matrix consisting of 'samples' number of sampling based on respective 
     #distributions of variables
