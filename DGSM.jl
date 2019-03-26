@@ -85,9 +85,9 @@ function DGSM(f,k, samples, rangeLower, rangeUpper,distri)
     
     #Initialising the E(|a|) E(a) and E(a^2) matrix to zeros
     #a is partial derivative of f wrt to xi
-    E_a = zeros(Float64,k,1)
-    E_moda = zeros(Float64,k,1)
-    E_a2 = zeros(Float64,k,1)
+    a = zeros(Float64,k,1)
+    absa = zeros(Float64,k,1)
+    asq = zeros(Float64,k,1)
     
     
     #Determining the upper and lower limits of k-dimensional sobol sequences
@@ -219,23 +219,23 @@ function DGSM(f,k, samples, rangeLower, rangeUpper,distri)
     
     #Evaluating E(a) and E(a^2)
     for j = 1:k
-        E_a[j] = mean(dfdx[:,j])
-        E_a2[j] = mean(dfdx[:,j].^2)
+        a[j] = mean(dfdx[:,j])
+        asq[j] = mean(dfdx[:,j].^2)
     end
     
     dfdx = abs.(dfdx)
     
     #Evaluating E(|a|)
     for j = 1:k
-        E_moda[j] = mean(dfdx[:,j])
+        absa[j] = mean(dfdx[:,j])
     end
     
     #This function finally returns a matrix ok k*3 matrix, consisting E(a), E(|a|) and E(a^2)
     #respectively for the k independent parameters
     #The ith row consists of E(a), E(|a|) and E(a^2) for the ith independent parameter
     
-    outputf = hcat(E_a, E_moda)
-    outputf = hcat(outputf , E_a2)
+    outputf = hcat(a, absa)
+    outputf = hcat(outputf , asq)
     return outputf
 end
     
