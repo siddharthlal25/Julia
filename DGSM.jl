@@ -83,12 +83,6 @@ function DGSM(f,k, samples, rangeLower, rangeUpper,distri)
     #Initialising the gradient matrix to zeros
     dfdx = zeros(Float64, samples, k)
     
-    #Initialising the E(|a|) E(a) and E(a^2) matrix to zeros
-    #a is partial derivative of f wrt to xi
-    a = zeros(Float64,k,1)
-    absa = zeros(Float64,k,1)
-    asq = zeros(Float64,k,1)
-    
     
     #Determining the upper and lower limits of k-dimensional sobol sequences
     #Transforming the real bounds into Sobol sequence bounds using cdf
