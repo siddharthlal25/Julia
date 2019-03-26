@@ -218,17 +218,15 @@ function DGSM(f,k, samples, rangeLower, rangeUpper,distri)
     end
     
     #Evaluating E(a) and E(a^2)
-    for j = 1:k
-        a[j] = mean(dfdx[:,j])
-        asq[j] = mean(dfdx[:,j].^2)
-    end
+    
+    a = [mean(dfdx[:,x]) for x in 1:k]
+    asq = [mean(dfdx[:,x].^2) for x in 1:k]
     
     dfdx = abs.(dfdx)
     
     #Evaluating E(|a|)
-    for j = 1:k
-        absa[j] = mean(dfdx[:,j])
-    end
+    
+    absa = [mean(dfdx[:,x]) for x in 1:k]
     
     #This function finally returns a matrix ok k*3 matrix, consisting E(a), E(|a|) and E(a^2)
     #respectively for the k independent parameters
